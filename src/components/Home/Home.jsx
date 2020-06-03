@@ -6,7 +6,11 @@ import Welcome from "../sections/Welcome";
 
 function Home() {
 	const [drawerState, toggler] = useContext(DrawerContext);
-	const actions = [{ href: "/app", title: "Home" }];
+	const actions = [
+		{ href: "/app", title: "Home" },
+		{ href: "/users", title: "Manage Users" },
+		{ href: "/roles", title: "Manage User Roles and Permissions" },
+	];
 	return (
 		<div>
 			<CustomAppBar toggler={toggler} />

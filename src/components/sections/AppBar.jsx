@@ -17,7 +17,10 @@ import { Menu, Search, ArrowBack } from "@material-ui/icons";
 import { useLoginForm } from "../utils/useForm";
 
 const useStyles = makeStyles((theme) => ({
-	drawer: { width: 500, padding: theme.spacing(8, 4) },
+	drawer: {
+		width: 500,
+		padding: theme.spacing(8, 4),
+	},
 	searchIcon: { color: theme.palette.background.default },
 	mobileSearchBar: {
 		padding: theme.spacing(1),
@@ -43,7 +46,7 @@ function CustomAppBar({ toggler }) {
 	};
 	return (
 		<div>
-			<AppBar position='static'>
+			<AppBar position='fixed' elevation={0}>
 				<Toolbar>
 					{token && (
 						<IconButton onClick={toggler} edge='start' color='inherit'>

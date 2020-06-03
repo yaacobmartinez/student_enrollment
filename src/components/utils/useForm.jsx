@@ -62,7 +62,7 @@ export const useLoginForm = (initialState) => {
 	return [values, handleChange, handleSubmit, errors, loading];
 };
 
-export const useUpdateUser = (initialState, toggler) => {
+export const useUpdateUser = (initialState, toggler, handleMessage) => {
 	const [currentUser, setCurrentUser] = useState(initialState);
 	const initialError = {
 		first_name: false,
@@ -127,9 +127,13 @@ export const useUpdateUser = (initialState, toggler) => {
 					await Axios.patch(`/users/${currentUser._id}`, currentUser, {
 						headers: { access_token },
 					}).then((res) => {
-						toggler();
+						if (res.data.success) {
+							toggler();
+							setLoading(false);
+							return window.location.assign("/users");
+						}
 						setLoading(false);
-						window.location.assign("/users");
+						handleMessage(true, `You don't have permission to do that.`);
 					});
 				};
 				updateUser();
@@ -138,20 +142,35 @@ export const useUpdateUser = (initialState, toggler) => {
 			}
 			return;
 		}
-		setLoading(true);
-		const addUser = async () => {
-			await Axios.post("/users/register", currentUser).then((res) => {
-				if (res.data.success) {
-					toggler();
+		try {
+			setLoading(true);
+			const addUser = async () => {
+				const access_token = localStorage.getItem("jwt");
+				await Axios.post("/users/register", currentUser, {
+					headers: { access_token },
+				}).then((res) => {
+					if (res.data.success) {
+						toggler();
+						setLoading(false);
+						return console.log(res.data);
+						// return window.location.assign("/users");
+					}
+					if (res.data.field !== "access") {
+						setLoading(false);
+						return setErrors({
+							...errors,
+							email: true,
+							email_error: res.data.message,
+						});
+					}
 					setLoading(false);
-					console.log(res.data);
-					return window.location.assign("/users");
-				}
-				setLoading(false);
-				setErrors({ ...errors, email: true, email_error: res.data.message });
-			});
-		};
-		addUser();
+					handleMessage(true, `You don't have permission to do that.`);
+				});
+			};
+			addUser();
+		} catch (error) {
+			console.log(error.message);
+		}
 	};
 	return [
 		currentUser,
@@ -161,4 +180,91 @@ export const useUpdateUser = (initialState, toggler) => {
 		errors,
 		loading,
 	];
+};
+
+export const useRegistrationForm = (
+	initialState,
+	setLoading,
+	setActiveStep
+) => {
+	const [values, setValues] = useState(initialState);
+	const initialError = {
+		first_name: false,
+		last_name: false,
+		middle_name: false,
+		sex: false,
+		date_of_birth: false,
+		first_name_error: "",
+		last_name_error: "",
+		middle_name_error: "",
+		sex_error: "",
+		date_of_birth_error: "",
+	};
+	const [errors, setErrors] = useState(initialError);
+
+	const handleChange = (e) => {
+		setErrors(initialError);
+		setValues({ ...values, [e.target.name]: e.target.value });
+	};
+
+	const setNext = () => {
+		setErrors(initialError);
+		if (!values.first_name) {
+			return setErrors({
+				...errors,
+				first_name: true,
+				first_name_error: `First Name is Required`,
+			});
+		}
+		if (!values.middle_name) {
+			return setErrors({
+				...errors,
+				middle_name: true,
+				middle_name_error: `Middle Name is Required`,
+			});
+		}
+		if (!values.last_name) {
+			return setErrors({
+				...errors,
+				last_name: true,
+				last_name_error: `Last Name is Required`,
+			});
+		}
+		if (!values.sex) {
+			return setErrors({
+				...errors,
+				sex: true,
+				sex_error: `Sex is Required`,
+			});
+		}
+		if (!values.date_of_birth) {
+			return setErrors({
+				...errors,
+				date_of_birth: true,
+				date_of_birth_error: `Date of Birth is Required`,
+			});
+		}
+		setActiveStep((prevStep) => prevStep + 1);
+	};
+	const setPrevious = () => {
+		setActiveStep((prevStep) => prevStep - 1);
+	};
+	const handleSubmit = () => {
+		setLoading(true);
+		const addStudent = async () => {
+			await Axios.post("/students", values)
+				.then((res) => {
+					if (res.data.success) {
+						setLoading(false);
+						return window.location.assign("/registration/success");
+					}
+					setLoading(false);
+					console.log(res.data);
+				})
+				.catch((err) => console.log(err.message));
+		};
+		addStudent();
+	};
+
+	return [values, handleChange, handleSubmit, errors, setNext, setPrevious];
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles, Drawer } from "@material-ui/core";
-import { AccountCircle } from "@material-ui/icons";
+import { makeStyles, Drawer, Snackbar, IconButton } from "@material-ui/core";
+import { AccountCircle, Close } from "@material-ui/icons";
 import Axios from "axios";
 import { useUpdateUser } from "../utils/useForm";
 import { ListItemTitle } from "../customStyledComponents/Text";
@@ -37,6 +37,16 @@ const UserDetails = ({ state, toggler, user }) => {
 			isCancelled = true;
 		};
 	}, []);
+	const [message, setMessage] = useState({
+		state: false,
+		message: "",
+	});
+	const handleMessage = (state, message) => {
+		setMessage({ state, message });
+	};
+	const handleClose = () => {
+		setMessage({ ...message, state: false });
+	};
 	const [
 		currentUser,
 		handleChange,
@@ -44,7 +54,7 @@ const UserDetails = ({ state, toggler, user }) => {
 		handleSubmit,
 		errors,
 		loading,
-	] = useUpdateUser(user, toggler);
+	] = useUpdateUser(user, toggler, handleMessage);
 	const passProps = {
 		currentUser,
 		handleChange,
@@ -57,6 +67,18 @@ const UserDetails = ({ state, toggler, user }) => {
 	};
 	return (
 		<div>
+			<Snackbar
+				open={message.state}
+				anchorOrigin={{ vertical: "top", horizontal: "right" }}
+				autoHideDuration={6000}
+				onClose={handleClose}
+				message={message.message}
+				action={
+					<IconButton size='small' color='inherit' onClick={handleClose}>
+						<Close fontSize='small' />
+					</IconButton>
+				}
+			/>
 			<Drawer
 				anchor='right'
 				open={state}

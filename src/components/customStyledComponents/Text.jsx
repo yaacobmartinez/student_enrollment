@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
 	pageherotitle: {
 		display: "flex",
 		alignItems: "center",
+		marginTop: theme.spacing(15),
 		[theme.breakpoints.down("xs")]: {
 			display: "block",
 		},
@@ -73,6 +74,23 @@ export const CustomSkeleton = () => {
 					style={{ marginLeft: 10, marginBottom: 6 }}
 				/>
 			</div>
+		</div>
+	);
+};
+
+export const CustomTitleSkeleton = () => {
+	return (
+		<div>
+			<Skeleton
+				height={30}
+				width='30%'
+				style={{ marginLeft: 10, marginBottom: 6 }}
+			/>
+			<Skeleton
+				height={20}
+				width='40%'
+				style={{ marginLeft: 10, marginBottom: 6 }}
+			/>
 		</div>
 	);
 };

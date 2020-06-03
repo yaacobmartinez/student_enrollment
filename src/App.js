@@ -8,8 +8,10 @@ import { AuthContextProvider } from "./components/contexts/AuthContext";
 import axios from "axios";
 import YouLostBro from "./components/sections/YouLostBro";
 import Registration from "./components/Login/Registration";
+import RegistrationSuccess from "./components/Login/RegistrationSuccess";
 import Users from "./components/Users/Users";
 import Roles from "./components/Roles/Roles";
+import User from "./components/Users/User/index";
 axios.defaults.baseURL = process.env.REACT_APP_DEFAULT_API_URL;
 const theme = createMuiTheme({
 	typography: {
@@ -37,9 +39,15 @@ function App() {
 					<AuthContextProvider>
 						<Switch>
 							<Route exact path='/' component={Login} />
-							<Route exact path='/register-student' component={Registration} />
+							<Route exact path='/registration' component={Registration} />
+							<Route
+								exact
+								path='/registration/success'
+								component={RegistrationSuccess}
+							/>
 							<ProtectedRoute exact path='/app' component={Home} />
 							<ProtectedRoute exact path='/users' component={Users} />
+							<ProtectedRoute exact path='/users/:id' component={User} />
 							<ProtectedRoute exact path='/roles' component={Roles} />
 							<Route path='*' component={YouLostBro} />
 						</Switch>
